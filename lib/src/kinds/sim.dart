@@ -286,7 +286,7 @@ class Tank {
       };
 
   Tank day(int g, int dayNo) {
-    var np = p + math.max(1, p ~/ g) - f ~/ 2;
+    var np = p + math.max<int>(1, p ~/ g) - f ~/ 2;
     var nf = f;
     if (p >= f) {
       nf += math.max(1, f ~/ 3);
