@@ -1,4 +1,4 @@
-/// Özgün Oyunlar ailesinin ortak motoru: kilimden takımyıldıza 23 özgün
+/// Özgün Oyunlar ailesinin ortak motoru: kilimden takımyıldıza 27 özgün
 /// bulmaca ve beceri oyunu; bölüm üretimi, doğrulama ve oyun ekranları.
 library;
 
