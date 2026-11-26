@@ -6,6 +6,7 @@ import 'kinds/folk.dart';
 import 'kinds/logic.dart';
 import 'kinds/mech.dart';
 import 'kinds/mosaic.dart';
+import 'kinds/patterns.dart';
 import 'kinds/sim.dart';
 import 'kinds/sky.dart';
 
@@ -41,6 +42,12 @@ const Map<String, OzgunKind> kOzgunKinds = {
   'karagoz': KaraKind(),
   'hoca': HocaKind(),
   'mozrest': MozaikKind(),
+  'kolam': KolamKind(),
+  'girih': GirihKind(),
+  'batik': BatikKind(),
+  'minyatur': MinyaturKind(),
+  'kagit-oyma': KagitOymaKind(),
+  'kina': KinaKind(),
 };
 
 OzgunRules ozgunRulesFor(String gameId, String kind) => ozgunRules(gameId, kOzgunKinds[kind]!);
