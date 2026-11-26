@@ -234,20 +234,31 @@ class OBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
+    final look = StudioLook.of(context);
     return Container(
       margin: const EdgeInsets.fromLTRB(8, 4, 8, 0),
       padding: const EdgeInsets.symmetric(horizontal: 10),
       height: 48,
-      decoration: BoxDecoration(color: scheme.surface.withValues(alpha: 0.92), borderRadius: BorderRadius.circular(16)),
+      decoration: BoxDecoration(
+        color: Colors.black.withValues(alpha: 0.28),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: look.accent.withValues(alpha: 0.45), width: 1.2),
+      ),
       child: Row(children: [
-        if (left.isNotEmpty) Text(left, style: const TextStyle(fontWeight: FontWeight.w700)),
+        if (left.isNotEmpty) Text(left, style: TextStyle(fontWeight: FontWeight.w900, color: look.number)),
         const SizedBox(width: 8),
-        Expanded(child: FittedBox(fit: BoxFit.scaleDown, alignment: AlignmentDirectional.centerStart, child: Text(status, maxLines: 1))),
+        Expanded(
+          child: FittedBox(
+            fit: BoxFit.scaleDown,
+            alignment: AlignmentDirectional.centerStart,
+            child: Text(status, maxLines: 1, style: const TextStyle(fontWeight: FontWeight.w700, color: kStudioSubtle)),
+          ),
+        ),
         ...extra,
         if (onUndo != null) IconButton(tooltip: ot(lang, 'undo'), onPressed: onUndo, icon: const Icon(Icons.undo)),
         if (onReset != null) IconButton(tooltip: ot(lang, 'reset'), onPressed: onReset, icon: const Icon(Icons.restart_alt)),
-        if (onHint != null) IconButton(tooltip: ot(lang, 'hint'), onPressed: onHint, icon: const Icon(Icons.lightbulb_outline)),
+        if (onHint != null)
+          IconButton(tooltip: ot(lang, 'hint'), onPressed: onHint, icon: const Icon(Icons.lightbulb_rounded, color: StudioLook.gold)),
       ]),
     );
   }
@@ -395,18 +406,26 @@ class OChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    final c = color ?? scheme.surface;
+    final look = StudioLook.of(context);
+    final c = color ?? Color.lerp(look.card, Colors.white, 0.08)!;
+    final bg = selected ? Color.lerp(c, look.accent, 0.35)! : c;
+    final fg = bg.computeLuminance() > 0.4 ? const Color(0xFF22303F) : Colors.white;
     final w = Material(
-      color: selected ? Color.lerp(c, scheme.primary, 0.35) : c,
+      color: bg,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(14),
-        side: BorderSide(color: selected ? scheme.primary : Colors.black12, width: selected ? 2.5 : 1),
+        side: BorderSide(color: selected ? look.accent : Colors.white24, width: selected ? 2.5 : 1),
       ),
       child: InkWell(
         borderRadius: BorderRadius.circular(14),
         onTap: onTap,
-        child: Padding(padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8), child: child),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          child: IconTheme.merge(
+            data: IconThemeData(color: fg),
+            child: DefaultTextStyle.merge(style: TextStyle(color: fg, fontWeight: FontWeight.w700), child: child),
+          ),
+        ),
       ),
     );
     final tt = tooltip;

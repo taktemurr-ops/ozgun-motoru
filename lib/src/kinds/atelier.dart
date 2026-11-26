@@ -805,7 +805,7 @@ class _TezhipViewState extends State<_TezhipView> with Clock {
               width: 34,
               height: 34,
               decoration: BoxDecoration(color: _tezhipPal[k], shape: BoxShape.circle, border: Border.all(color: Colors.black26)),
-              child: k == 0 ? const Icon(Icons.cleaning_services_outlined, size: 18) : null,
+              child: k == 0 ? const Icon(Icons.cleaning_services_outlined, size: 18, color: Color(0xFF22303F)) : null,
             ),
           ),
       ]),
