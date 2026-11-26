@@ -11,6 +11,7 @@ import 'package:studio_core/core/rng.dart';
 import 'package:studio_core/core/stats.dart';
 
 import 'texts.dart';
+import 'studio_chrome.dart';
 
 /// Özgün oyunlardan birinin kurulmuş bölümü.
 abstract class OPuzzle {
@@ -137,8 +138,12 @@ class OzgunStage extends StatelessWidget {
   final OzgunRules rules;
   const OzgunStage({super.key, required this.ctx, required this.rules});
 
+  /// Motorun bütün arayüzü (paneller, pencereler, düğmeler) onaylı koyu
+  /// tasarımda; tahta çizimleri kendi renklerini korur.
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) => StudioChrome(child: Builder(builder: _build));
+
+  Widget _build(BuildContext context) {
     final lv = ctx.generated.puzzle as OLevel;
     return rules.kind.build(OzgunPlay(ctx: ctx, puzzle: lv.puzzle, d: lv.d, seed: ctx.spec.seed));
   }
