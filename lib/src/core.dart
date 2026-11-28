@@ -152,8 +152,21 @@ class OzgunStage extends StatelessWidget {
 
   Widget _build(BuildContext context) {
     final lv = ctx.generated.puzzle as OLevel;
-    return rules.kind.build(OzgunPlay(ctx: ctx, puzzle: lv.puzzle, d: lv.d, seed: ctx.spec.seed));
+    final early = ctx.spec.mode == GameModeId.campaign && ctx.spec.levelId <= 3;
+    return OzgunEarly(early: early, child: rules.kind.build(OzgunPlay(ctx: ctx, puzzle: lv.puzzle, d: lv.d, seed: ctx.spec.seed)));
   }
+}
+
+/// Kampanyanın ilk bölümleri: takılan oyuncuya ipucu düğmesi nazikçe
+/// gösterilir (iyi bulmaca oyunlarının ilk dakika rehberliği gibi).
+class OzgunEarly extends InheritedWidget {
+  final bool early;
+  const OzgunEarly({super.key, required this.early, required super.child});
+
+  static bool of(BuildContext context) => context.dependOnInheritedWidgetOfExactType<OzgunEarly>()?.early ?? false;
+
+  @override
+  bool updateShouldNotify(OzgunEarly old) => old.early != early;
 }
 
 OzgunRules ozgunRules(String gameId, OzgunKind kind) => OzgunRules(gameId: gameId, kind: kind);
@@ -264,9 +277,72 @@ class OBar extends StatelessWidget {
         ...extra,
         if (onUndo != null) IconButton(tooltip: ot(lang, 'undo'), onPressed: onUndo, icon: const Icon(Icons.undo)),
         if (onReset != null) IconButton(tooltip: ot(lang, 'reset'), onPressed: onReset, icon: const Icon(Icons.restart_alt)),
-        if (onHint != null)
-          IconButton(tooltip: ot(lang, 'hint'), onPressed: onHint, icon: const Icon(Icons.lightbulb_rounded, color: StudioLook.gold)),
+        if (onHint != null) _HintButton(tooltip: ot(lang, 'hint'), onHint: onHint!, early: OzgunEarly.of(context)),
       ]),
+    );
+  }
+}
+
+/// İpucu düğmesi. İlk bölümlerde 20 sn sonra altın hâleyle öne çıkar
+/// (harcama yapmaz; yalnız gösterir). Sonsuz animasyon yok.
+class _HintButton extends StatefulWidget {
+  final String tooltip;
+  final VoidCallback onHint;
+  final bool early;
+  const _HintButton({required this.tooltip, required this.onHint, required this.early});
+
+  @override
+  State<_HintButton> createState() => _HintButtonState();
+}
+
+class _HintButtonState extends State<_HintButton> {
+  Timer? _t;
+  bool nudge = false;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.early) {
+      _t = Timer(const Duration(seconds: 20), () {
+        if (mounted) setState(() => nudge = true);
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    _t?.cancel();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final b = IconButton(
+      tooltip: widget.tooltip,
+      onPressed: () {
+        _t?.cancel();
+        if (nudge) setState(() => nudge = false);
+        widget.onHint();
+      },
+      icon: const Icon(Icons.lightbulb_rounded, color: StudioLook.gold),
+    );
+    if (!nudge) return b;
+    return TweenAnimationBuilder<double>(
+      tween: Tween(begin: 0, end: 1),
+      duration: const Duration(milliseconds: 800),
+      curve: Curves.elasticOut,
+      child: b,
+      builder: (context, v, ch) => Transform.scale(
+        scale: 1 + 0.18 * v,
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: StudioLook.gold.withValues(alpha: 0.18),
+            boxShadow: [BoxShadow(color: StudioLook.gold.withValues(alpha: 0.55), blurRadius: 14, spreadRadius: 1)],
+          ),
+          child: ch,
+        ),
+      ),
     );
   }
 }
