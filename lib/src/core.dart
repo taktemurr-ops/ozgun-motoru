@@ -86,9 +86,16 @@ class OzgunRules extends GameRules<OLevel> {
   @override
   List<MissionTemplate> get missionTemplates => kind.missions;
 
+  /// Kampanyanın başında hissedilir ilerleme. Stüdyo planı ilk 20 bölümü
+  /// zorluk 1'de tutar; bulmaca türünün en iyi örneklerinde ilk 10 bölümde
+  /// tahta büyür. 1–2. bölüm tanıtım (1), 3. bölümden bir, 6. bölümden bir
+  /// basamak daha eklenir; uyarlanabilir zorluk payı ve dünya testeresi korunur.
+  static int rampOf(LevelSpec spec) =>
+      spec.mode == GameModeId.campaign ? (spec.levelId >= 3 ? 1 : 0) + (spec.levelId >= 6 ? 1 : 0) : 0;
+
   @override
   OLevel generate(LevelSpec spec) {
-    final d = clampI(spec.difficulty, 1, 10);
+    final d = clampI(spec.difficulty + rampOf(spec), 1, 10);
     return OLevel(kind.id, d, realizeOzgun(kind, d, spec.seed));
   }
 
